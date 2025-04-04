@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="C:/Users/emiele.ariola/Documents/pccount.png" type="image/png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PC Model Counter</title>
+  <style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    padding: 20px;
+    position: relative;
+  }
+  .model {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .buttons button {
+    font-size: 18px;
+    padding: 10px 15px;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+  .count {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0 15px;
+  }
+  #reset-btn, #save-btn {
+    position: absolute;
+    top: 20px;
+    padding: 10px 15px;
+    font-size: 14px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  #reset-btn {
+    right: 150px;
+    background-color: #ff5c5c;
+  }
+  #save-btn {
+    right: 20px;
+    background-color: #4CAF50;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    body {
+      padding: 10px;
+    }
+    .model {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .buttons {
+      margin-top: 10px;
+    }
+    #reset-btn, #save-btn {
+      position: static;
+      margin: 10px 5px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 24px;
+      text-align: center;
+    }
+  }
+  </style>
+</head>
+<body>
+  <h1>PC Model Counter</h1>
+  <button id="reset-btn">Reset</button>
+  <button id="save-btn">Save</button>
+
+  <div id="models"></div>
+
+  <script>
+    const models = [
+      "Dell Optiplex 9020",
+      "Dell Optiplex 9020m",
+      "Dell Optiplex 3020",
+      "Dell Optiplex 3000",
+      "Dell Optiplex 3080",
+      "Lenovo ThinkCentre m710q",
+      "Lenovo ThinkCentre m70q Gen 3",
+      "Lenovo S510",
+      "HP ProDesk 400 G4 SFF",
+      "HP Prodesk 400 G3 SFF",
+      "HP Pro Mini 260 G9"
+    ];
+
+    const counts = {};
+    const countElements = {};
+    const container = document.getElementById('models');
+
+    models.forEach(model => {
+      counts[model] = 0;
+
+      const modelDiv = document.createElement('div');
+      modelDiv.className = 'model';
+
+      const name = document.createElement('span');
+      name.textContent = model;
+
+      const buttons = document.createElement('div');
+      buttons.className = 'buttons';
+
+      const minusBtn = document.createElement('button');
+      minusBtn.textContent = '–';
+
+      const countSpan = document.createElement('span');
+      countSpan.className = 'count';
+      countSpan.textContent = counts[model];
+      countElements[model] = countSpan;
+
+      const plusBtn = document.createElement('button');
+      plusBtn.textContent = '+';
+    
+      // decrement
+      minusBtn.onclick = () => {
+        if (counts[model] > 0) {
+          counts[model]--;
+          countSpan.textContent = counts[model];
+        }
+      };
+
+      // increment
+      plusBtn.onclick = () => {
+        counts[model]++;
+        countSpan.textContent = counts[model];
+      };
+
+      buttons.appendChild(minusBtn);
+      buttons.appendChild(countSpan);
+      buttons.appendChild(plusBtn);
+
+      modelDiv.appendChild(name);
+      modelDiv.appendChild(buttons);
+
+      container.appendChild(modelDiv);
+    });
+    // reset input values
+    document.getElementById('reset-btn').onclick = () => {
+      models.forEach(model => {
+        counts[model] = 0;
+        countElements[model].textContent = 0;
+      });
+    };
+    // doesn't include the model if value is 0
+    document.getElementById('save-btn').onclick = () => {
+      let csvContent = "Model,Total\n";
+      models.forEach(model => {
+        if (counts[model] > 0) { 
+          csvContent += `${model},${counts[model]}\n`;
+        }
+      });
+      
+      // will prompt the filename
+      const filename = prompt("Enter file name", "campaign.csv");
+      if (!filename) return;
+      
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+  </script>
+</body>
+</html>
